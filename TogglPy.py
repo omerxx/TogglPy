@@ -3,6 +3,7 @@
 # library for interacting with the Toggl API.
 #--------------------------------------------------------------
 from datetime import datetime
+import random
 # for making requests
 import urllib2
 import urllib
@@ -159,6 +160,38 @@ class Toggl():
         timestruct = datetime(year, month, day, hour-2).isoformat() + '.000Z'
         data['time_entry']['start'] = timestruct
         data['time_entry']['duration'] = hourduration*3600
+        data['time_entry']['pid'] = projectid
+        data['time_entry']['created_with'] = 'NAME'
+
+        response = self.postRequest(Endpoints.TIME_ENTRIES, parameters=data)
+        return self.decodeJSON(response)
+
+    def randomizeTimeEntry(self, projectid=None, projectname=None, clientname=None,
+                           durationslist=[9], starthourlist=[9], year=None, month=None,
+                           day=None):
+        data = {
+            'time_entry': {}
+        }
+
+        if not projectid:
+            if projectname and clientname:
+                projectid = (self.getClientProject(clientname, projectname))['data']['id']
+            elif projectname:
+                projectid = (self.searchClientProject(projectname))['data']['id']
+            else:
+                print 'Too many missing parameters for query'
+                exit(1)
+
+        year = datetime.now().year if not year else year
+        month = datetime.now().month if not month else month
+        day = datetime.now().day if not day else day
+        hour = random.choice(starthourlist)
+        minute = random.randint(30, 59) if hour == 9 else random.randint(0, 20)
+        second = random.randint(1, 59)
+
+        timestruct = datetime(year, month, day, hour-2, minute, second).isoformat() + '.000Z'
+        data['time_entry']['start'] = timestruct
+        data['time_entry']['duration'] = random.choice(durationslist) * (3611 + random.randint(-20, 150))
         data['time_entry']['pid'] = projectid
         data['time_entry']['created_with'] = 'NAME'
 

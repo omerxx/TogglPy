@@ -156,3 +156,9 @@ if datetime.datetime.today().weekday() not in (4, 5):
 ```shell
 (crontab -l ; echo "0 22 * * * toggl_entry.py")| crontab -
 ```
+
+### Randomize time entry :)
+#### Will randomize time durations based on given lists, to the level of seconds
+```python
+toggl.randomizeTimeEntry(projectname='pname', durationslist=[8,9,10], starthourlist=[6,7])
+```
